@@ -42,6 +42,23 @@ editor.once('load', () => {
         root: root
     });
 
+    // controls ai generate
+    const btnAiGenerate = new Button({
+        text: 'AI Generate',
+        hidden: !writePermission
+    });
+    btnAiGenerate.on('click', () => {
+        editor.call('bridge:aiGenerate');
+    });
+    controls.append(btnAiGenerate);
+
+    LegacyTooltip.attach({
+        target: btnAiGenerate.element,
+        text: 'AI Generate',
+        align: 'top',
+        root: root
+    });
+
     // controls duplicate
     const btnDuplicate = new Button({
         icon: 'E288',
@@ -89,6 +106,7 @@ editor.once('load', () => {
 
     editor.on('permissions:writeState', (canWrite: boolean) => {
         btnAdd.hidden = !canWrite;
+        btnAiGenerate.hidden = !canWrite;
         btnDuplicate.hidden = !canWrite;
         btnDelete.hidden = !canWrite;
     });

@@ -86,6 +86,7 @@ import './schema/schema-anim-state-graph';
 
 // components
 import './components/scrollbar/components-scrollbar-defaults';
+import './components/bridge/components-ai-generate-bridge';
 
 // entities
 import './entities/entities-selection';
