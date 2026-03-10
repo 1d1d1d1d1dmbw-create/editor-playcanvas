@@ -87,6 +87,7 @@ import './schema/schema-anim-state-graph';
 // components
 import './components/scrollbar/components-scrollbar-defaults';
 import './components/bridge/components-ai-generate-bridge';
+import './components/bridge/task-packet-bridge';
 
 // entities
 import './entities/entities-selection';
@@ -457,15 +458,3 @@ import './templates/migrations/fix-corrupted-instances';
 
 // plugins
 import './plugins/plugins';
-// Listen for AI or UI commands from your Next.js website
-window.addEventListener('message', (event) => {
-    // Only accept messages from your website
-    if (event.origin.includes('localhost:3000')) {
-        const { action, payload } = event.data;
-        
-        if (action === 'log') {
-            console.log("From Next.js:", payload);
-        }
-        // Add your logic here (e.g., spawning assets, changing materials)
-    }
-});
