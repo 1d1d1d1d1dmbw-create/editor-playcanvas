@@ -1,4 +1,4 @@
-import { MeshInstance } from 'playcanvas';
+import { type Entity, MeshInstance } from 'playcanvas';
 
 import { config } from '@/editor/config';
 
@@ -76,7 +76,7 @@ editor.once('load', () => {
         }
     };
 
-    const onHover = function (entity: import('playcanvas').Entity | null, meshInstance: import('playcanvas').MeshInstance | null): void {
+    const onHover = function (entity: Entity | null, meshInstance: MeshInstance | null): void {
         if (entity === hoverEntity && meshInstance === hoverMeshInstance) {
             return;
         }
@@ -89,7 +89,7 @@ editor.once('load', () => {
         setCubemap();
     };
 
-    const onPickHover = function (node: import('playcanvas').Entity | null, picked: import('playcanvas').MeshInstance | unknown): void {
+    const onPickHover = function (node: Entity | null, picked: MeshInstance | unknown): void {
         let meshInstance = null;
 
         if (node && node._icon) {
@@ -97,7 +97,7 @@ editor.once('load', () => {
         }
 
         if (!node) {
-            onHover(null);
+            onHover(null, null);
             return;
         }
 
@@ -108,7 +108,7 @@ editor.once('load', () => {
         if (node.model && meshInstance && (!meshInstance.node._parent || !meshInstance.node._parent._icon)) {
             onHover(node, meshInstance);
         } else {
-            onHover(null);
+            onHover(null, null);
         }
     };
 
