@@ -48,7 +48,7 @@ editor.once('load', () => {
         hidden: !writePermission
     });
     btnAiGenerate.on('click', () => {
-        editor.call('bridge:aiGenerate');
+        console.log('AI Generate clicked');
     });
     controls.append(btnAiGenerate);
 
