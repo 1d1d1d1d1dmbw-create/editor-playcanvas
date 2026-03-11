@@ -3,6 +3,8 @@ import { Container, Button, BooleanInput, Label, Divider } from '@playcanvas/pcu
 import { LegacyTooltip } from '@/common/ui/tooltip';
 import { config } from '@/editor/config';
 
+import { getLaunchTargetUrl, getEngineVersionQuery } from './launch-url';
+
 editor.once('load', () => {
     const root = editor.call('layout.root');
     const viewport = editor.call('layout.viewport');
@@ -53,66 +55,70 @@ editor.once('load', () => {
     const launchOptions = { };
 
     const launchApp = (deviceOptions: { webgpu?: boolean; webgl2?: boolean; webgl1?: boolean; [key: string]: boolean | undefined } = {}, popup?: boolean) => {
-        let url = config.url.launch + config.scene.id;
+        const launchTargetUrl = getLaunchTargetUrl(config.url.launch, config.scene.id, config.project.playUrl);
+        if (!launchTargetUrl) {
+            return;
+        }
 
-        const query = [];
+        const url = new URL(launchTargetUrl, window.location.origin);
+        const query: [string, string][] = [];
 
         if (deviceOptions.webgpu) {
-            query.push('device=webgpu');
+            query.push(['device', 'webgpu']);
         } else if (deviceOptions.webgl2) {
-            query.push('device=webgl2');
+            query.push(['device', 'webgl2']);
         } else if (deviceOptions.webgl1) {
-            query.push('device=webgl1');
+            query.push(['device', 'webgl1']);
         }
 
         if (launchOptions.profiler) {
-            query.push('profile=true');
+            query.push(['profile', 'true']);
         }
 
         if (launchOptions.debug) {
-            query.push('debug=true');
+            query.push(['debug', 'true']);
         }
 
         if (launchOptions.concatenate) {
-            query.push('concatenateScripts=true');
+            query.push(['concatenateScripts', 'true']);
         }
 
         if (launchOptions.disableBundles) {
-            query.push('useBundles=false');
+            query.push(['useBundles', 'false']);
         }
 
         if (launchOptions.ministats) {
-            query.push('ministats=true');
+            query.push(['ministats', 'true']);
         }
 
         const params = new URLSearchParams(location.search);
         if (params.has('use_local_engine')) {
-            query.push(`use_local_engine=${params.get('use_local_engine')}`);
+            query.push(['use_local_engine', params.get('use_local_engine')]);
         } else if (releaseCandidate && launchOptions.releaseCandidate) {
-            query.push(`version=${releaseCandidate}`);
+            query.push(['version', releaseCandidate]);
         } else if (launchOptions.force) {
-            query.push(`version=${config.engineVersions.force.version}`);
+            query.push(['version', config.engineVersions.force.version]);
         } else {
             const engineVersion = editor.call('settings:session').get('engineVersion');
-            if (engineVersion && engineVersion !== 'current') {
-                query.push(`version=${config.engineVersions[engineVersion].version}`);
+            const engineVersionQuery = getEngineVersionQuery(config.engineVersions, engineVersion);
+            if (engineVersionQuery) {
+                const [key, value] = engineVersionQuery.split('=');
+                query.push([key, value]);
             }
         }
 
         if (params.has('use_local_frontend')) {
-            query.push(`use_local_frontend=${params.get('use_local_frontend')}`);
+            query.push(['use_local_frontend', params.get('use_local_frontend')]);
         }
 
-        if (query.length) {
-            url += `?${query.join('&')}`;
-        }
+        query.forEach(([key, value]) => {
+            if (value !== null) {
+                url.searchParams.set(key, value);
+            }
+        });
 
-        const features = popup ? 'popup' : undefined;
-        const launcher = window.open('', '_blank', features);
-        if (launcher) {
-            launcher.opener = null;
-            launcher.location = url;
-        }
+        const features = popup ? 'popup,noopener,noreferrer' : 'noopener,noreferrer';
+        window.open(url.toString(), '_blank', features);
     };
 
     buttonLaunch.on('click', (e: MouseEvent) => launchApp({}, e.shiftKey));
