@@ -3,7 +3,7 @@ import { Container, Button, BooleanInput, Label, Divider } from '@playcanvas/pcu
 import { LegacyTooltip } from '@/common/ui/tooltip';
 import { config } from '@/editor/config';
 
-import { getLaunchTargetUrl, getEngineVersionQuery } from './launch-url';
+import { buildLaunchSceneUrl } from './launch-url';
 
 editor.once('load', () => {
     const root = editor.call('layout.root');
@@ -55,12 +55,9 @@ editor.once('load', () => {
     const launchOptions = { };
 
     const launchApp = (deviceOptions: { webgpu?: boolean; webgl2?: boolean; webgl1?: boolean; [key: string]: boolean | undefined } = {}, popup?: boolean) => {
-        const launchTargetUrl = getLaunchTargetUrl(config.url.launch, config.scene.id, config.project.playUrl, config.url.home, config.project.id);
-        if (!launchTargetUrl) {
-            return;
-        }
+        let url = buildLaunchSceneUrl(config.url.launch, config.scene.id);
 
-        const url = new URL(launchTargetUrl, config.url.home || window.location.origin);
+        const url = new URL(launchTargetUrl, window.location.origin);
         const query: [string, string][] = [];
 
         if (deviceOptions.webgpu) {
@@ -102,8 +99,7 @@ editor.once('load', () => {
             const engineVersion = editor.call('settings:session').get('engineVersion');
             const engineVersionQuery = getEngineVersionQuery(config.engineVersions, engineVersion);
             if (engineVersionQuery) {
-                const [key, value] = engineVersionQuery.split('=');
-                query.push([key, value]);
+                query.push(engineVersionQuery);
             }
         }
 
@@ -118,7 +114,7 @@ editor.once('load', () => {
         });
 
         const features = popup ? 'popup,noopener,noreferrer' : 'noopener,noreferrer';
-        window.open(url.toString(), '_blank', features);
+        window.open(url, '_blank', features);
     };
 
     buttonLaunch.on('click', (e: MouseEvent) => launchApp({}, e.shiftKey));
