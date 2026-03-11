@@ -96,8 +96,9 @@ editor.once('load', () => {
             query.push(`version=${config.engineVersions.force.version}`);
         } else {
             const engineVersion = editor.call('settings:session').get('engineVersion');
-            if (engineVersion && engineVersion !== 'current') {
-                query.push(`version=${config.engineVersions[engineVersion].version}`);
+            const engineVersionQuery = getEngineVersionQuery(config.engineVersions, engineVersion);
+            if (engineVersionQuery) {
+                query.push(engineVersionQuery);
             }
         }
 
@@ -109,12 +110,8 @@ editor.once('load', () => {
             url += `?${query.join('&')}`;
         }
 
-        const features = popup ? 'popup' : undefined;
-        const launcher = window.open('', '_blank', features);
-        if (launcher) {
-            launcher.opener = null;
-            launcher.location = url;
-        }
+        const features = popup ? 'popup,noopener,noreferrer' : 'noopener,noreferrer';
+        window.open(url, '_blank', features);
     };
 
     buttonLaunch.on('click', (e: MouseEvent) => launchApp({}, e.shiftKey));
