@@ -3,6 +3,8 @@ import { Container, Button, BooleanInput, Label, Divider } from '@playcanvas/pcu
 import { LegacyTooltip } from '@/common/ui/tooltip';
 import { config } from '@/editor/config';
 
+import { buildLaunchSceneUrl } from './launch-url';
+
 editor.once('load', () => {
     const root = editor.call('layout.root');
     const viewport = editor.call('layout.viewport');
@@ -53,7 +55,7 @@ editor.once('load', () => {
     const launchOptions = { };
 
     const launchApp = (deviceOptions: { webgpu?: boolean; webgl2?: boolean; webgl1?: boolean; [key: string]: boolean | undefined } = {}, popup?: boolean) => {
-        let url = config.url.launch + config.scene.id;
+        let url = buildLaunchSceneUrl(config.url.launch, config.scene.id);
 
         const query = [];
 
