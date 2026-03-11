@@ -3,7 +3,7 @@ import { Container, Button, BooleanInput, Label, Divider } from '@playcanvas/pcu
 import { LegacyTooltip } from '@/common/ui/tooltip';
 import { config } from '@/editor/config';
 
-import { buildLaunchSceneUrl, getEngineVersionQuery } from './launch-url';
+import { buildLaunchSceneUrl } from './launch-url';
 
 editor.once('load', () => {
     const root = editor.call('layout.root');
